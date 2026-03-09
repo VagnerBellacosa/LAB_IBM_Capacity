@@ -129,3 +129,16 @@ out.innerHTML+="<div>COMMAND NOT RECOGNIZED</div>"
 document.getElementById("consoleInput").value=""
 
 }
+
+function rand(min,max){
+return Math.floor(Math.random()*(max-min+1))+min
+}
+
+function updateCapacity(){
+
+document.getElementById("cpu_h1").innerText = rand(40,90) + "%"
+document.getElementById("cpu_h2").innerText = rand(40,90) + "%"
+document.getElementById("cpu_h3").innerText = rand(40,90) + "%"
+document.getElementById("cpu_h4").innerText = rand(40,90) + "%"
+
+}
