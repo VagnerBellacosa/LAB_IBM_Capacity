@@ -142,3 +142,32 @@ document.getElementById("cpu_h3").innerText = rand(40,90) + "%"
 document.getElementById("cpu_h4").innerText = rand(40,90) + "%"
 
 }
+
+function simulateOverload(){
+
+console.log("Simulating system overload...")
+
+document.getElementById("cpu").innerText = "99%"
+document.getElementById("mem").innerText = "95%"
+document.getElementById("jobs").innerText = "1800"
+document.getElementById("net").innerText = "1200 MB/s"
+
+showIncident("CPU OVERLOAD DETECTED")
+
+}
+
+function showIncident(msg){
+
+let div = document.getElementById("incident")
+
+div.innerText = msg
+div.style.display = "block"
+
+setTimeout(()=>{
+
+div.style.display="none"
+
+},6000)
+
+}
+
