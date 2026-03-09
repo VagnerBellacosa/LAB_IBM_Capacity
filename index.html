@@ -1,94 +1,36 @@
+```html
 <!DOCTYPE html>
-
-<!--
-=========================================================
-IBM Z OPERATIONS SIMULATOR
-Mainframe Dashboard Simulation
-Author: Vagner Bellacosa
-SEO Optimized Version
-=========================================================
-
-SEO KEYWORDS
-mainframe simulator
-IBM Z dashboard
-zOS monitoring
-JES2 CICS DB2 monitoring
-mainframe training
-mainframe operations center
--->
-
 <html lang="pt-br">
 
 <head>
 
-<!-- =========================
-CHARSET & VIEWPORT
-========================= -->
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- =========================
-SEO META TAGS
-========================= -->
-
 <title>IBM Z Operations Simulator | Mainframe Dashboard</title>
 
-<meta name="description" content="Simulador de operações IBM Z e z/OS. Dashboard educacional com métricas de CPU, JES2, CICS, DB2, LPAR, Storage e Network. Ideal para treinamento de mainframe.">
-
-<meta name="keywords" content="IBM Z, mainframe simulator, zOS dashboard, mainframe monitoring, JES2 CICS DB2 simulator, mainframe training">
-
+<meta name="description" content="Simulador educacional de operações IBM Z e z/OS">
+<meta name="keywords" content="IBM Z, mainframe simulator, zOS dashboard">
 <meta name="author" content="Vagner Bellacosa">
-
-<meta name="robots" content="index, follow">
-
-<!-- =========================
-OPEN GRAPH (LINKEDIN / SOCIAL)
-========================= -->
 
 <meta property="og:title" content="IBM Z Operations Simulator">
 <meta property="og:description" content="Simulador educacional de operações de mainframe IBM Z">
 <meta property="og:type" content="website">
-<meta property="og:image" content="assets\img\cover.png">
+<meta property="og:image" content="assets/img/cover.png">
 
-<meta name="msvalidate.01" content="CC3361AD860DBFE70D5DC045E61758B5" />
-
-<link rel="shortcut icon" type="imagex/png" href="Page/img/z17.ico">
-
-
-
-<!-- =========================
-FAVICON
-========================= -->
-
-<link rel="icon" href="favicon.ico" type="image/x-icon">
-
-<!-- =========================
-CSS
-========================= -->
-
-<link rel="stylesheet" href="assets\css\style.css">
-
-<!-- =========================
-CHART.JS
-========================= -->
+<link rel="stylesheet" href="assets/css/style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
-
 <body>
 
-<!-- =================================================
-IPL SCREEN
-Simulates the Initial Program Load of a z/OS system
-================================================= -->
+<!-- IPL SCREEN -->
 
 <div id="ipl-screen">
 
 <pre id="ipl-text">
-
 IPL 0A80
 IEA995I SY1 SYSTEM READY
 HASP373 JES2 INITIALIZATION COMPLETE
@@ -96,32 +38,19 @@ VTAM INITIALIZED
 TCPIP STACK READY
 CICS REGION CICSPROD STARTED
 DB2 SUBSYSTEM DB2P ACTIVE
-
 </pre>
 
 <button onclick="startSystem()">ENTER SYSTEM</button>
 
 </div>
 
-
-<!-- =================================================
-MAIN DASHBOARD
-================================================= -->
-
 <div id="dashboard">
 
 <header class="header">
-
 <h1>IBM Z OPERATIONS CENTER</h1>
-
 <span id="timer">00:00</span>
-
 </header>
 
-
-<!-- =================================================
-NAVIGATION TABS
-================================================= -->
 
 <nav class="tabs">
 
@@ -132,27 +61,20 @@ NAVIGATION TABS
 <button onclick="showTab('storage')">Storage</button>
 <button onclick="showTab('network')">Network</button>
 <button onclick="showTab('lpar')">LPAR</button>
+<button onclick="showTab('capacity')">Capacity</button>
 <button onclick="showTab('console')">Console</button>
 
 </nav>
 
 
-<!-- =================================================
-DASHBOARD CONTENT
-================================================= -->
-
 <main class="content">
-
-<!-- =========================
-OVERVIEW TAB
-========================= -->
 
 <section id="overview" class="tab">
 
 <h2>System Overview</h2>
 
-<div class="metric">CPU <span id="cpu"></span></div>
-<div class="metric">Memory <span id="mem"></span></div>
+<div class="metric">CPU <span id="cpu"></span>%</div>
+<div class="metric">Memory <span id="mem"></span>%</div>
 <div class="metric">Jobs <span id="jobs"></span></div>
 <div class="metric">Network <span id="net"></span></div>
 
@@ -160,10 +82,6 @@ OVERVIEW TAB
 
 </section>
 
-
-<!-- =========================
-JES2
-========================= -->
 
 <section id="jes2" class="tab">
 
@@ -176,10 +94,6 @@ JES2
 </section>
 
 
-<!-- =========================
-CICS
-========================= -->
-
 <section id="cics" class="tab">
 
 <h2>CICS Region</h2>
@@ -190,10 +104,6 @@ CICS
 
 </section>
 
-
-<!-- =========================
-DB2
-========================= -->
 
 <section id="db2" class="tab">
 
@@ -206,10 +116,6 @@ DB2
 </section>
 
 
-<!-- =========================
-STORAGE
-========================= -->
-
 <section id="storage" class="tab">
 
 <h2>DASD Storage</h2>
@@ -220,10 +126,6 @@ STORAGE
 </section>
 
 
-<!-- =========================
-NETWORK
-========================= -->
-
 <section id="network" class="tab">
 
 <h2>TCP/IP Network</h2>
@@ -233,10 +135,6 @@ NETWORK
 
 </section>
 
-
-<!-- =========================
-LPAR
-========================= -->
 
 <section id="lpar" class="tab">
 
@@ -277,9 +175,56 @@ LPAR
 </section>
 
 
-<!-- =========================
-OPERATOR CONSOLE
-========================= -->
+<section id="capacity" class="tab">
+
+<h2>Capacity Planning & CPU Simulator</h2>
+
+<div class="metric">Current CPU: <span id="cpuNow"></span>%</div>
+<div class="metric">Estimated MIPS: <span id="mips"></span></div>
+<div class="metric">Estimated MSU: <span id="msu"></span></div>
+
+<h3>Last 4 Hours CPU Average</h3>
+
+<table>
+
+<tr>
+<th>Hour</th>
+<th>CPU</th>
+</tr>
+
+<tr>
+<td>H-1</td>
+<td id="cpuH1"></td>
+</tr>
+
+<tr>
+<td>H-2</td>
+<td id="cpuH2"></td>
+</tr>
+
+<tr>
+<td>H-3</td>
+<td id="cpuH3"></td>
+</tr>
+
+<tr>
+<td>H-4</td>
+<td id="cpuH4"></td>
+</tr>
+
+</table>
+
+<canvas id="capacityChart"></canvas>
+
+<br>
+
+<button onclick="simulateOverload()">Simulate CPU Overload</button>
+<button onclick="normalizeSystem()">Normalize Workload</button>
+
+<div id="capacityStatus"></div>
+
+</section>
+
 
 <section id="console" class="tab">
 
@@ -295,16 +240,13 @@ OPERATOR CONSOLE
 
 </main>
 
-
-<!-- INCIDENT ALERTS -->
-
-<div id="incident"></div>
+</div>
 
 
-<!-- =================================================
-VISIT COUNTER
-Professional lightweight visitor counter
-================================================= -->
+<br>
+<br>
+<br>
+
 
 <div class="visitor-counter">
 
@@ -576,40 +518,19 @@ document.getElementById("visitCount").innerText = res.value
 <br><br>
 <br>
 
-<!-- =================================================
-FOOTER
-================================================= -->
 
 
 <footer class="footer">
 
-<p>
-IBM Z Operations Simulator
-</p>
-
-<p>
-Educational Mainframe Monitoring Dashboard
-</p>
-
-<p>
-Created by <strong>Vagner Bellacosa</strong>
-</p>
-
-<p>
-Technologies: HTML • CSS • JavaScript • Chart.js
-</p>
-
-<p>
-© 2026 Bellacosa Mainframe
-</p>
+<p>IBM Z Operations Simulator</p>
+<p>Educational Mainframe Monitoring Dashboard</p>
+<p>Created by <strong>Vagner Bellacosa</strong></p>
 
 </footer>
 
-
-<!-- MAIN SIMULATOR SCRIPT -->
-
-<script src="assets\js\simulator.js"></script>
+<script src="assets/js/simulator.js"></script>
 
 </body>
 
 </html>
+```
