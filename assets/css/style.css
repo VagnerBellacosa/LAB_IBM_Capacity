@@ -347,3 +347,30 @@ color:#000;
 display:none;
 }
 
+
+.lab-buttons{
+
+display:flex;
+gap:10px;
+margin:10px 0;
+
+}
+
+.lab-buttons button{
+
+background:#111;
+color:#00ff9c;
+border:1px solid #00ff9c;
+padding:6px 12px;
+cursor:pointer;
+font-family:monospace;
+
+}
+
+.lab-buttons button:hover{
+
+background:#00ff9c;
+color:#000;
+
+}
+

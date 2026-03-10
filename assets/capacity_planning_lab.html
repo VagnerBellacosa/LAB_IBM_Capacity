@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>IBM Z Capacity Planning Lab</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+background:#020b1a;
+color:#00ff9c;
+font-family:monospace;
+margin:0;
+}
+
+.header{
+background:#111;
+padding:15px;
+text-align:center;
+font-size:22px;
+}
+
+.container{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+padding:20px;
+}
+
+.card{
+background:#111;
+padding:15px;
+}
+
+.console{
+background:black;
+height:200px;
+overflow:auto;
+padding:10px;
+}
+
+.light{
+width:20px;
+height:20px;
+border-radius:50%;
+display:inline-block;
+}
+
+.green{background:green}
+.yellow{background:yellow}
+.red{background:red}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+IBM Z CAPACITY PLANNING LAB
+
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<h3>Time</h3>
+
+<div id="time"></div>
+
+<h3>Phase</h3>
+
+<div id="phase"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Capacity Metrics</h3>
+
+MSU: <span id="msu"></span><br>
+MIPS: <span id="mips"></span><br>
+4HRA: <span id="hra"></span>
+
+</div>
+
+<div class="card">
+
+<h3>Billing</h3>
+
+Monthly Cost: $<span id="cost"></span><br>
+Subcapacity: <span id="subcap"></span>
+
+</div>
+
+<div class="card">
+
+<h3>LPAR Weights</h3>
+
+PROD: <span id="w1"></span><br>
+BATCH: <span id="w2"></span><br>
+TEST: <span id="w3"></span>
+
+</div>
+
+<div class="card">
+
+<h3>CPU Status</h3>
+
+<div class="light green" id="g"></div>
+<div class="light yellow" id="y"></div>
+<div class="light red" id="r"></div>
+
+</div>
+
+<div class="card">
+
+<h3>MSU Graph</h3>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+<div class="card">
+
+<h3>3270 Console</h3>
+
+<div class="console" id="console"></div>
+
+</div>
+
+</div>
+
+<script>
+
+let minute=0
+let msuData=[]
+let hraWindow=[]
+
+let pricePerMSU=55
+
+function rand(min,max){
+return Math.floor(Math.random()*(max-min+1))+min
+}
+
+function log(msg){
+
+let c=document.getElementById("console")
+
+c.innerHTML+=msg+"<br>"
+
+c.scrollTop=c.scrollHeight
+
+}
+
+function update(){
+
+minute++
+
+if(minute>720) minute=0
+
+let hour=Math.floor(minute/60)
+
+let phase
+let msu
+
+if(hour<6){
+
+phase="BATCH WINDOW"
+msu=rand(700,1200)
+
+}else{
+
+phase="ONLINE"
+msu=rand(300,700)
+
+}
+
+let mips=msu*10
+
+hraWindow.push(msu)
+
+if(hraWindow.length>240) hraWindow.shift()
+
+let hra=Math.floor(hraWindow.reduce((a,b)=>a+b,0)/hraWindow.length)
+
+let monthlyCost=Math.floor(hra*pricePerMSU)
+
+document.getElementById("time").innerText=hour+":00"
+document.getElementById("phase").innerText=phase
+
+document.getElementById("msu").innerText=msu
+document.getElementById("mips").innerText=mips
+document.getElementById("hra").innerText=hra
+
+document.getElementById("cost").innerText=monthlyCost
+
+simulateWLM()
+simulateWeights()
+simulateCapping(msu)
+updateChart(msu)
+
+}
+
+function simulateWLM(){
+
+if(rand(1,20)==10){
+
+log("WLM POLICY CHANGE DETECTED")
+
+}
+
+}
+
+function simulateWeights(){
+
+let w1=rand(200,400)
+let w2=rand(100,300)
+let w3=rand(50,150)
+
+document.getElementById("w1").innerText=w1
+document.getElementById("w2").innerText=w2
+document.getElementById("w3").innerText=w3
+
+}
+
+function simulateCapping(msu){
+
+let g=document.getElementById("g")
+let y=document.getElementById("y")
+let r=document.getElementById("r")
+
+g.style.opacity=0.2
+y.style.opacity=0.2
+r.style.opacity=0.2
+
+if(msu<600){
+
+g.style.opacity=1
+document.getElementById("subcap").innerText="YES"
+
+}else if(msu<900){
+
+y.style.opacity=1
+document.getElementById("subcap").innerText="LIMIT"
+
+log("CPU CAPPING NEAR LIMIT")
+
+}else{
+
+r.style.opacity=1
+document.getElementById("subcap").innerText="NO"
+
+log("CAPACITY ALERT: MSU ABOVE LICENSED LIMIT")
+
+}
+
+}
+
+const ctx=document.getElementById("chart")
+
+let chart=new Chart(ctx,{
+
+type:"line",
+
+data:{
+
+labels:[],
+
+datasets:[{
+
+label:"MSU",
+
+data:msuData,
+
+borderColor:"lime"
+
+}]
+
+},
+
+options:{animation:false}
+
+})
+
+function updateChart(msu){
+
+msuData.push(msu)
+
+if(msuData.length>120) msuData.shift()
+
+chart.update()
+
+}
+
+setInterval(update,2000)
+
+log("CAPACITY MONITOR STARTED")
+
+</script>
+
+</body>
+
+</html>
