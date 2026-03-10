@@ -374,3 +374,68 @@ color:#000;
 
 }
 
+.knowledge{
+
+padding:40px;
+
+}
+
+.subtitle{
+
+text-align:center;
+margin-bottom:30px;
+color:#88ffaa;
+
+}
+
+.knowledge-grid{
+
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+
+}
+
+.knowledge-card{
+
+background:#111;
+border:1px solid #00ff9c;
+padding:15px;
+border-radius:6px;
+
+}
+
+.knowledge-card h3{
+
+color:#00ff9c;
+font-size:16px;
+
+}
+
+.knowledge-card iframe{
+
+width:100%;
+height:220px;
+border:none;
+background:black;
+
+}
+
+.knowledge-card button{
+
+margin-top:10px;
+background:black;
+color:#00ff9c;
+border:1px solid #00ff9c;
+padding:6px 12px;
+cursor:pointer;
+font-family:monospace;
+
+}
+
+.knowledge-card button:hover{
+
+background:#00ff9c;
+color:black;
+
+}
