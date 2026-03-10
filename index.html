@@ -74,6 +74,16 @@ CHART.JS
 
 <body>
 
+<!-- =========================================
+IBM SYSTEM/360 STATUS PANEL
+========================================= -->
+
+<div class="s360-panel">
+
+<img src="assets/img/bellacosa1974.png" alt="Bellacosa System 1974 Status Panel">
+
+</div>
+
 <!-- =================================================
 IPL SCREEN
 Simulates the Initial Program Load of a z/OS system
@@ -313,6 +323,70 @@ Capacity Simulator
 
 <div id="incident"></div>
 
+
+
+
+<!-- =========================================
+IBM SYSTEM/360 ACTIVITY PANEL
+========================================= -->
+
+<div class="s360-panel">
+
+<div class="led-row" id="ledRow"></div>
+
+</div>
+
+<script>
+
+/* =========================================
+S360 LED ACTIVITY SIMULATION
+========================================= */
+
+const ledRow = document.getElementById("ledRow")
+
+const ledCount = 60
+
+for(let i=0;i<ledCount;i++){
+
+let led = document.createElement("div")
+
+led.className="led"
+
+ledRow.appendChild(led)
+
+}
+
+function randomActivity(){
+
+let leds = document.querySelectorAll(".led")
+
+leds.forEach(led=>{
+
+let r=Math.random()
+
+led.className="led"
+
+if(r<0.3){
+
+led.classList.add("green")
+
+}else if(r<0.45){
+
+led.classList.add("yellow")
+
+}else if(r<0.5){
+
+led.classList.add("red")
+
+}
+
+})
+
+}
+
+setInterval(randomActivity,200)
+
+</script>
 
 <!-- =================================================
 VISIT COUNTER
