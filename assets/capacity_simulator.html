@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>IBM Z Capacity Simulator - 12h Cycle</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+background:#020b1a;
+color:#00ff9c;
+font-family:monospace;
+margin:0;
+}
+
+.header{
+background:#111;
+padding:15px;
+text-align:center;
+font-size:22px;
+}
+
+.container{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+padding:20px;
+}
+
+.card{
+background:#111;
+padding:15px;
+border-radius:6px;
+}
+
+.light{
+width:20px;
+height:20px;
+border-radius:50%;
+display:inline-block;
+margin-right:10px;
+}
+
+.green{background:green}
+.yellow{background:yellow}
+.red{background:red}
+
+.console{
+background:black;
+height:200px;
+overflow:auto;
+padding:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+IBM Z CAPACITY SIMULATOR — 12 HOUR CYCLE
+
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Time</h2>
+
+<div id="time"></div>
+
+<h2>Phase</h2>
+
+<div id="phase"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>Capacity Metrics</h2>
+
+MSU: <span id="msu"></span><br>
+MIPS: <span id="mips"></span><br>
+4HRA: <span id="hra"></span>
+
+</div>
+
+
+<div class="card">
+
+<h2>Status Lights</h2>
+
+<div class="light green" id="green"></div> OK<br>
+<div class="light yellow" id="yellow"></div> WARNING<br>
+<div class="light red" id="red"></div> CRITICAL
+
+</div>
+
+
+<div class="card">
+
+<h2>MSU Graph</h2>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+
+<div class="card">
+
+<h2>Console 3270</h2>
+
+<div class="console" id="console"></div>
+
+</div>
+
+</div>
+
+<script>
+
+let minute=0
+
+let msuData=[]
+let hraWindow=[]
+
+function rand(min,max){
+
+return Math.floor(Math.random()*(max-min+1))+min
+
+}
+
+function log(msg){
+
+let c=document.getElementById("console")
+
+c.innerHTML+=msg+"<br>"
+
+c.scrollTop=c.scrollHeight
+
+}
+
+function update(){
+
+minute++
+
+if(minute>720) minute=0
+
+let hour=Math.floor(minute/60)
+
+let phase="ONLINE"
+
+let msu
+
+if(hour<6){
+
+phase="BATCH WINDOW"
+
+msu=rand(700,1200)
+
+}else{
+
+phase="ONLINE"
+
+msu=rand(300,700)
+
+}
+
+let mips=msu*10
+
+hraWindow.push(msu)
+
+if(hraWindow.length>240) hraWindow.shift()
+
+let hra=Math.floor(hraWindow.reduce((a,b)=>a+b,0)/hraWindow.length)
+
+document.getElementById("time").innerText=hour+":00"
+
+document.getElementById("phase").innerText=phase
+
+document.getElementById("msu").innerText=msu
+
+document.getElementById("mips").innerText=mips
+
+document.getElementById("hra").innerText=hra
+
+updateLights(msu,hra)
+
+updateChart(msu)
+
+}
+
+function updateLights(msu,hra){
+
+let g=document.getElementById("green")
+let y=document.getElementById("yellow")
+let r=document.getElementById("red")
+
+g.style.opacity=0.2
+y.style.opacity=0.2
+r.style.opacity=0.2
+
+if(hra<600){
+
+g.style.opacity=1
+
+}else if(hra<900){
+
+y.style.opacity=1
+
+log("WARNING: 4HRA approaching capacity")
+
+}else{
+
+r.style.opacity=1
+
+log("CRITICAL: 4HRA threshold exceeded")
+
+}
+
+}
+
+const ctx=document.getElementById("chart")
+
+let chart=new Chart(ctx,{
+
+type:"line",
+
+data:{
+
+labels:[],
+
+datasets:[{
+
+label:"MSU",
+
+data:msuData,
+
+borderColor:"lime"
+
+}]
+
+},
+
+options:{animation:false}
+
+})
+
+function updateChart(msu){
+
+msuData.push(msu)
+
+if(msuData.length>100) msuData.shift()
+
+chart.update()
+
+}
+
+setInterval(update,2000)
+
+log("SYSTEM CAPACITY MONITOR STARTED")
+
+</script>
+
+</body>
+
+</html>
