@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<!--
+=========================================================
+IBM Z OPERATIONS SIMULATOR
+Mainframe Capacity & Operations Lab
+Author: Vagner Bellacosa
+=========================================================
+
+SEO Keywords:
+IBM Z simulator
+Mainframe dashboard
+zOS monitoring
+JES2 CICS DB2 simulator
+Mainframe training lab
+-->
+
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>IBM Z Operations Simulator | Mainframe Dashboard</title>
+
+<meta name="description" content="Simulador educacional de operações IBM Z e z/OS com métricas de CPU, JES2, CICS, DB2, LPAR, Storage e Network.">
+
+<meta name="keywords" content="IBM Z, mainframe simulator, zOS dashboard, JES2 CICS DB2 monitoring, mainframe training">
+
+<meta name="author" content="Vagner Bellacosa">
+
+<meta name="robots" content="index,follow">
+
+<link rel="stylesheet" href="assets/css/style.css">
+
+<link rel="icon" href="favicon.ico">
+
+<!-- Chart library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<!-- =========================================
+IPL SCREEN
+========================================= -->
+
+<div id="ipl-screen">
+
+<pre id="ipl-text">
+
+IPL 0A80
+IEA995I SY1 SYSTEM READY
+HASP373 JES2 INITIALIZATION COMPLETE
+VTAM INITIALIZED
+TCPIP STACK READY
+CICS REGION CICSPROD STARTED
+DB2 SUBSYSTEM DB2P ACTIVE
+
+</pre>
+
+<button type="button" onclick="startSystem()">ENTER SYSTEM</button>
+
+</div>
+
+
+<!-- =========================================
+MAIN DASHBOARD
+========================================= -->
+
+<div id="dashboard" style="display:none;">
+
+<header class="header">
+
+<h1>IBM Z OPERATIONS CENTER</h1>
+
+<span id="timer">00:00</span>
+
+</header>
+
+
+<!-- =========================================
+NAVIGATION
+========================================= -->
+
+<nav class="tabs">
+
+<button type="button" onclick="showTab('overview')">Overview</button>
+<button type="button" onclick="showTab('jes2')">JES2</button>
+<button type="button" onclick="showTab('cics')">CICS</button>
+<button type="button" onclick="showTab('db2')">DB2</button>
+<button type="button" onclick="showTab('storage')">Storage</button>
+<button type="button" onclick="showTab('network')">Network</button>
+<button type="button" onclick="showTab('lpar')">LPAR</button>
+<button type="button" onclick="showTab('console')">Console</button>
+
+</nav>
+
+
+<!-- =========================================
+CONTENT AREA
+========================================= -->
+
+<main class="content">
+
+
+<!-- OVERVIEW -->
+
+<section id="overview" class="tab">
+
+<h2>System Overview</h2>
+
+<div class="metric">CPU <span id="cpu"></span></div>
+<div class="metric">Memory <span id="mem"></span></div>
+<div class="metric">Jobs <span id="jobs"></span></div>
+<div class="metric">Network <span id="net"></span></div>
+
+<canvas id="cpuChart"></canvas>
+
+</section>
+
+
+<!-- JES2 -->
+
+<section id="jes2" class="tab">
+
+<h2>JES2 Queue</h2>
+
+<div>Running Jobs: <span id="jobsrun"></span></div>
+<div>Queued Jobs: <span id="jobsqueue"></span></div>
+<div>Output Queue: <span id="spool"></span></div>
+
+</section>
+
+
+<!-- CICS -->
+
+<section id="cics" class="tab">
+
+<h2>CICS Region</h2>
+
+<div>Transactions/sec: <span id="cicsTps"></span></div>
+<div>Response time: <span id="cicsResp"></span> ms</div>
+<div>Active tasks: <span id="cicsTask"></span></div>
+
+</section>
+
+
+<!-- DB2 -->
+
+<section id="db2" class="tab">
+
+<h2>DB2 Subsystem</h2>
+
+<div>Threads: <span id="db2Threads"></span></div>
+<div>Locks: <span id="db2Locks"></span></div>
+<div>Bufferpool Hit: <span id="db2Buffer"></span>%</div>
+
+</section>
+
+
+<!-- STORAGE -->
+
+<section id="storage" class="tab">
+
+<h2>DASD Storage</h2>
+
+<div>DASD Used: <span id="dasd"></span>%</div>
+<div>I/O per sec: <span id="io"></span></div>
+
+</section>
+
+
+<!-- NETWORK -->
+
+<section id="network" class="tab">
+
+<h2>TCP/IP Network</h2>
+
+<div>Sessions: <span id="tcp"></span></div>
+<div>Bandwidth MB/s: <span id="band"></span></div>
+
+</section>
+
+
+<!-- LPAR -->
+
+<section id="lpar" class="tab">
+
+<h2>LPAR Workloads</h2>
+
+<table>
+
+<tr>
+<th>LPAR</th>
+<th>CPU</th>
+<th>Memory</th>
+<th>Workload</th>
+</tr>
+
+<tr>
+<td>LPAR1</td>
+<td id="lpar1cpu"></td>
+<td id="lpar1mem"></td>
+<td>PRODUCTION</td>
+</tr>
+
+<tr>
+<td>LPAR2</td>
+<td id="lpar2cpu"></td>
+<td id="lpar2mem"></td>
+<td>BATCH</td>
+</tr>
+
+<tr>
+<td>LPAR3</td>
+<td id="lpar3cpu"></td>
+<td id="lpar3mem"></td>
+<td>TEST</td>
+</tr>
+
+</table>
+
+</section>
+
+
+<!-- CONSOLE -->
+
+<section id="console" class="tab">
+
+<h2>Operator Console</h2>
+
+<div id="consoleOutput"></div>
+
+<input id="consoleInput" placeholder="Command...">
+
+<button type="button" onclick="sendCommand()">Send</button>
+
+</section>
+
+
+</main>
+
+
+<!-- INCIDENT ALERT -->
+
+<div id="incident"></div>
+
+<br><br><br><br><br><br><br>
+
+<!-- =========================================
+VISITOR COUNTER
+========================================= -->
+
+<div class="visitor-counter">
+
+👁 Visitors:
+<span id="visitCount">Loading...</span>
+
+</div>
+
+<script>
+
+try{
+
+fetch("https://api.countapi.xyz/hit/lab_ibm_capacity/visits")
+
+.then(res => res.json())
+
+.then(res => {
+
+document.getElementById("visitCount").innerText = res.value
+
+})
+
+}catch(e){
+
+console.log("visitor counter error")
+
+}
+
+</script>
+
+<br><br><br>
+
+
+<br><br><br>
+
+
+<br><br><br>
+
+<!-- =========================================
+FOOTER
+========================================= -->
+
+<footer class="footer">
+
+<p><strong>IBM Z Operations Simulator</strong></p>
+
+<p>Mainframe Monitoring & Capacity Planning Lab</p>
+
+<p>Created by Vagner Bellacosa</p>
+
+<p>Technologies: HTML • CSS • JavaScript • Chart.js</p>
+
+<p>© 2026 Bellacosa Mainframe</p>
+
+</footer>
+
+
+<!-- =========================================
+MAIN SCRIPT
+========================================= -->
+
+<script src="assets/js/simulator.js" defer></script>
+
+</body>
+</html>
