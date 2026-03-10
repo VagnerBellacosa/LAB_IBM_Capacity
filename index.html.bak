@@ -287,15 +287,6 @@ OPERATOR CONSOLE
 
 </section>
 
-<!-- =========================
-RMF Dashboard
-========================= -->
-
-<button onclick="window.open('assets/rmf_dashboard.html')">
-RMF Dashboard
-</button>
-
-
 </main>
 
 
@@ -309,11 +300,6 @@ VISIT COUNTER
 Professional lightweight visitor counter
 ================================================= -->
 
-
-<br>
-<h2> Mainframe Work </h2>
-<br>
-<br>
 <div class="visitor-counter">
 
 👁 Visitors:
@@ -335,6 +321,10 @@ document.getElementById("visitCount").innerText = res.value
 </script>
 
 
+<br>
+<h2> Mainframe Work </h2>
+<br>
+<br>
 
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 

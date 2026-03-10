@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>IBM Z RMF Operations Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+background:#020b1a;
+color:#00ff9c;
+font-family:monospace;
+margin:0;
+}
+
+.header{
+background:#111;
+padding:15px;
+text-align:center;
+font-size:22px;
+}
+
+.container{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+padding:20px;
+}
+
+.card{
+background:#111;
+padding:15px;
+border-radius:6px;
+}
+
+h2{
+margin-top:0;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+td,th{
+border:1px solid #00ff9c;
+padding:5px;
+text-align:center;
+}
+
+.alert{
+
+position:fixed;
+top:0;
+left:0;
+right:0;
+
+background:red;
+color:white;
+
+text-align:center;
+padding:10px;
+
+display:none;
+
+font-weight:bold;
+
+animation:blink 1s infinite;
+
+}
+
+@keyframes blink{
+
+50%{opacity:0}
+
+}
+
+.network{
+
+display:flex;
+justify-content:space-around;
+margin-top:10px;
+
+}
+
+.node{
+
+border:2px solid #00ff9c;
+padding:10px;
+border-radius:5px;
+
+}
+
+.console{
+
+background:black;
+height:200px;
+overflow:auto;
+padding:10px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+IBM Z RMF / WLM OPERATIONS DASHBOARD
+
+</div>
+
+<div class="alert" id="alert">
+
+CPU SATURATION DETECTED
+
+</div>
+
+<div class="container">
+
+<!-- CPU -->
+
+<div class="card">
+
+<h2>CPU RMF</h2>
+
+<canvas id="cpuChart"></canvas>
+
+</div>
+
+<!-- WLM -->
+
+<div class="card">
+
+<h2>WLM Workloads</h2>
+
+<table>
+
+<tr>
+<th>Service Class</th>
+<th>CPU%</th>
+<th>Velocity</th>
+</tr>
+
+<tr>
+<td>PRODOLTP</td>
+<td id="wlm1"></td>
+<td id="vel1"></td>
+</tr>
+
+<tr>
+<td>BATCH</td>
+<td id="wlm2"></td>
+<td id="vel2"></td>
+</tr>
+
+<tr>
+<td>REPORT</td>
+<td id="wlm3"></td>
+<td id="vel3"></td>
+</tr>
+
+</table>
+
+</div>
+
+<!-- DASD -->
+
+<div class="card">
+
+<h2>DASD Volumes 3390</h2>
+
+<table>
+
+<tr>
+<th>Volume</th>
+<th>Used%</th>
+<th>IOPS</th>
+</tr>
+
+<tr>
+<td>PRD001</td>
+<td id="d1"></td>
+<td id="io1"></td>
+</tr>
+
+<tr>
+<td>PRD002</td>
+<td id="d2"></td>
+<td id="io2"></td>
+</tr>
+
+<tr>
+<td>DB2001</td>
+<td id="d3"></td>
+<td id="io3"></td>
+</tr>
+
+</table>
+
+</div>
+
+<!-- NETWORK -->
+
+<div class="card">
+
+<h2>Network Map</h2>
+
+<div class="network">
+
+<div class="node">CICS</div>
+
+<div class="node">DB2</div>
+
+<div class="node">MQ</div>
+
+<div class="node">TCPIP</div>
+
+</div>
+
+</div>
+
+<!-- CONSOLE -->
+
+<div class="card">
+
+<h2>3270 Console</h2>
+
+<div class="console" id="console"></div>
+
+</div>
+
+</div>
+
+<script>
+
+function rand(min,max){
+
+return Math.floor(Math.random()*(max-min+1))+min
+
+}
+
+function update(){
+
+document.getElementById("wlm1").innerText=rand(10,70)
+document.getElementById("wlm2").innerText=rand(10,60)
+document.getElementById("wlm3").innerText=rand(5,40)
+
+document.getElementById("vel1").innerText=rand(60,99)
+document.getElementById("vel2").innerText=rand(40,80)
+document.getElementById("vel3").innerText=rand(30,70)
+
+document.getElementById("d1").innerText=rand(40,90)+"%"
+document.getElementById("d2").innerText=rand(30,85)+"%"
+document.getElementById("d3").innerText=rand(20,80)+"%"
+
+document.getElementById("io1").innerText=rand(500,5000)
+document.getElementById("io2").innerText=rand(500,5000)
+document.getElementById("io3").innerText=rand(500,5000)
+
+let cpu=rand(20,95)
+
+cpuData.push(cpu)
+
+if(cpuData.length>50) cpuData.shift()
+
+chart.update()
+
+if(cpu>90){
+
+let alert=document.getElementById("alert")
+
+alert.style.display="block"
+
+setTimeout(()=>{
+
+alert.style.display="none"
+
+},4000)
+
+}
+
+}
+
+const ctx=document.getElementById("cpuChart")
+
+let cpuData=[]
+
+const chart=new Chart(ctx,{
+
+type:"line",
+
+data:{
+
+labels:[],
+
+datasets:[{
+
+label:"CPU%",
+
+data:cpuData,
+
+borderColor:"lime"
+
+}]
+
+},
+
+options:{animation:false}
+
+})
+
+setInterval(update,2000)
+
+</script>
+
+</body>
+
+</html>
