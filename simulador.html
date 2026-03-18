@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+
+<!--
+=========================================================
+IBM Z OPERATIONS SIMULATOR
+Mainframe Dashboard Simulation
+Author: Vagner Bellacosa
+SEO Optimized Version
+=========================================================
+
+SEO KEYWORDS
+mainframe simulator
+IBM Z dashboard
+zOS monitoring
+JES2 CICS DB2 monitoring
+mainframe training
+mainframe operations center
+-->
+
+<html lang="pt-br">
+
+<head>
+
+<!-- =========================
+CHARSET & VIEWPORT
+========================= -->
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- =========================
+SEO META TAGS
+========================= -->
+
+<title>IBM Z Operations Simulator | Mainframe Dashboard</title>
+
+<meta name="description" content="Simulador de operações IBM Z e z/OS. Dashboard educacional com métricas de CPU, JES2, CICS, DB2, LPAR, Storage e Network. Ideal para treinamento de mainframe.">
+
+<meta name="keywords" content="IBM Z, mainframe simulator, zOS dashboard, mainframe monitoring, JES2 CICS DB2 simulator, mainframe training">
+
+<meta name="author" content="Vagner Bellacosa">
+
+<meta name="robots" content="index, follow">
+
+<!-- =========================
+OPEN GRAPH (LINKEDIN / SOCIAL)
+========================= -->
+
+<meta property="og:title" content="IBM Z Operations Simulator">
+<meta property="og:description" content="Simulador educacional de operações de mainframe IBM Z">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets\img\cover.png">
+
+<!-- =========================
+FAVICON
+========================= -->
+
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
+<!-- =========================
+CSS
+========================= -->
+
+<link rel="stylesheet" href="assets\css\style.css">
+
+<!-- =========================
+CHART.JS
+========================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+
+<body>
+
+<!-- =========================================
+IBM SYSTEM/360 STATUS PANEL
+========================================= -->
+
+<div class="s360-panel">
+
+<img src="assets/img/bellacosa1974.png" alt="Bellacosa System 1974 Status Panel">
+
+</div>
+
+<!-- =================================================
+IPL SCREEN
+Simulates the Initial Program Load of a z/OS system
+================================================= -->
+
+<div id="ipl-screen">
+
+<pre id="ipl-text">
+
+IPL 0A80
+IEA995I SY1 SYSTEM READY
+HASP373 JES2 INITIALIZATION COMPLETE
+VTAM INITIALIZED
+TCPIP STACK READY
+CICS REGION CICSPROD STARTED
+DB2 SUBSYSTEM DB2P ACTIVE
+
+</pre>
+
+<button onclick="startSystem()">ENTER SYSTEM</button>
+
+</div>
+
+
+<!-- =================================================
+MAIN DASHBOARD
+================================================= -->
+
+<div id="dashboard">
+
+<header class="header">
+
+<h1>IBM Z OPERATIONS CENTER</h1>
+
+<span id="timer">00:00</span>
+
+</header>
+
+
+<!-- =================================================
+NAVIGATION TABS
+================================================= -->
+
+<nav class="tabs">
+
+<button onclick="showTab('overview')">Overview</button>
+<button onclick="showTab('jes2')">JES2</button>
+<button onclick="showTab('cics')">CICS</button>
+<button onclick="showTab('db2')">DB2</button>
+<button onclick="showTab('storage')">Storage</button>
+<button onclick="showTab('network')">Network</button>
+<button onclick="showTab('lpar')">LPAR</button>
+<button onclick="showTab('console')">Console</button>
+
+</nav>
+
+
+<!-- =================================================
+DASHBOARD CONTENT
+================================================= -->
+
+<main class="content">
+
+<!-- =========================
+OVERVIEW TAB
+========================= -->
+
+<section id="overview" class="tab">
+
+<h2>System Overview</h2>
+
+<div class="metric">CPU <span id="cpu"></span></div>
+<div class="metric">Memory <span id="mem"></span></div>
+<div class="metric">Jobs <span id="jobs"></span></div>
+<div class="metric">Network <span id="net"></span></div>
+
+<canvas id="cpuChart"></canvas>
+
+</section>
+
+
+<!-- =========================
+JES2
+========================= -->
+
+<section id="jes2" class="tab">
+
+<h2>JES2 Queue</h2>
+
+<div>Running Jobs: <span id="jobsrun"></span></div>
+<div>Queued Jobs: <span id="jobsqueue"></span></div>
+<div>Output Queue: <span id="spool"></span></div>
+
+</section>
+
+
+<!-- =========================
+CICS
+========================= -->
+
+<section id="cics" class="tab">
+
+<h2>CICS Region</h2>
+
+<div>Transactions/sec: <span id="cicsTps"></span></div>
+<div>Response time: <span id="cicsResp"></span> ms</div>
+<div>Active tasks: <span id="cicsTask"></span></div>
+
+</section>
+
+
+<!-- =========================
+DB2
+========================= -->
+
+<section id="db2" class="tab">
+
+<h2>DB2 Subsystem</h2>
+
+<div>Threads: <span id="db2Threads"></span></div>
+<div>Locks: <span id="db2Locks"></span></div>
+<div>Bufferpool Hit: <span id="db2Buffer"></span>%</div>
+
+</section>
+
+
+<!-- =========================
+STORAGE
+========================= -->
+
+<section id="storage" class="tab">
+
+<h2>DASD Storage</h2>
+
+<div>DASD Used: <span id="dasd"></span>%</div>
+<div>I/O per sec: <span id="io"></span></div>
+
+</section>
+
+
+<!-- =========================
+NETWORK
+========================= -->
+
+<section id="network" class="tab">
+
+<h2>TCP/IP Network</h2>
+
+<div>Sessions: <span id="tcp"></span></div>
+<div>Bandwidth MB/s: <span id="band"></span></div>
+
+</section>
+
+
+<!-- =========================
+LPAR
+========================= -->
+
+<section id="lpar" class="tab">
+
+<h2>LPAR Workloads</h2>
+
+<table>
+
+<tr>
+<th>LPAR</th>
+<th>CPU</th>
+<th>Memory</th>
+<th>Workload</th>
+</tr>
+
+<tr>
+<td>LPAR1</td>
+<td id="lpar1cpu"></td>
+<td id="lpar1mem"></td>
+<td>PRODUCTION</td>
+</tr>
+
+<tr>
+<td>LPAR2</td>
+<td id="lpar2cpu"></td>
+<td id="lpar2mem"></td>
+<td>BATCH</td>
+</tr>
+
+<tr>
+<td>LPAR3</td>
+<td id="lpar3cpu"></td>
+<td id="lpar3mem"></td>
+<td>TEST</td>
+</tr>
+
+</table>
+
+</section>
+
+
+<!-- =========================
+OPERATOR CONSOLE
+========================= -->
+
+<section id="console" class="tab">
+
+<h2>Operator Console</h2>
+
+<div id="consoleOutput"></div>
+
+<input id="consoleInput" placeholder="Command...">
+
+<button onclick="sendCommand()">Send</button>
+
+</section>
+
+<!-- =========================
+TOOLS / LABS
+========================= -->
+
+<div class="lab-buttons">
+
+<button onclick="window.open('assets/rmf_dashboard.html')">
+RMF Dashboard
+</button>
+
+<button onclick="window.open('assets/capacity_simulator.html')">
+Capacity Simulator
+</button>
+
+</div>
+
+
+</main>
+
+
+
+
+<!-- INCIDENT ALERTS -->
+
+<div id="incident"></div>
+
+
+
+
+<!-- =========================================
+IBM SYSTEM/360 ACTIVITY PANEL
+========================================= -->
+
+<div class="s360-panel">
+
+<div class="led-row" id="ledRow"></div>
+
+</div>
+
+<script>
+
+/* =========================================
+S360 LED ACTIVITY SIMULATION
+========================================= */
+
+const ledRow = document.getElementById("ledRow")
+
+const ledCount = 60
+
+for(let i=0;i<ledCount;i++){
+
+let led = document.createElement("div")
+
+led.className="led"
+
+ledRow.appendChild(led)
+
+}
+
+function randomActivity(){
+
+let leds = document.querySelectorAll(".led")
+
+leds.forEach(led=>{
+
+let r=Math.random()
+
+led.className="led"
+
+if(r<0.3){
+
+led.classList.add("green")
+
+}else if(r<0.45){
+
+led.classList.add("yellow")
+
+}else if(r<0.5){
+
+led.classList.add("red")
+
+}
+
+})
+
+}
+
+setInterval(randomActivity,200)
+
+</script>
+
+<!-- =================================================
+VISIT COUNTER
+Professional lightweight visitor counter
+================================================= -->
+
+
+<br>
+<h2> Mainframe Work </h2>
+<br>
+<br>
+<div class="visitor-counter">
+
+👁 Visitors:
+<span id="visitCount">Loading...</span>
+
+</div>
+
+
+<script>
+
+fetch("https://api.countapi.xyz/hit/mainframe-simulator/visits")
+.then(res => res.json())
+.then(res => {
+
+document.getElementById("visitCount").innerText = res.value
+
+})
+
+</script>
+
+<br>
+<br>
+<br>
+<br>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div style="text-align:center; margin-top:20px;">
+👨‍💻 Visitantes: 
+<span id="busuanzi_value_site_uv"></span>
+|
+📄 Visualizações:
+<span id="busuanzi_value_page_pv"></span>
+</div>
+
+<img src="https://visitor-badge.laobi.icu/badge?page_id=vagnerbellacosa.LAB_IBM_IPLMainframe">
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+<!-- =========================================
+MAINFRAME KNOWLEDGE VAULT
+========================================= -->
+
+<section class="knowledge">
+
+<h2>📚 Mainframe Knowledge Vault</h2>
+
+<p class="subtitle">
+Registros históricos recuperados do arquivo El Jefe Midnight Lunch.
+Explore histórias, conceitos e curiosidades do universo mainframe.
+</p>
+
+<div class="knowledge-grid">
+
+<!-- TEMPLATE CARD -->
+<div class="knowledge-card">
+<h3>Portal El Jefe Midnight Lunch</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/" target="_blank">
+<button>Abrir Portal</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>CI/CD & DevOps</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2014/07/cicd-devops.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2014/07/cicd-devops.html" target="_blank">
+<button>Ler Artigo</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Guia Padawan Mainframe</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2014/09/guia-definitivo-para-padawans-em-ibm.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2014/09/guia-definitivo-para-padawans-em-ibm.html" target="_blank">
+<button>Iniciar Jornada</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Iniciação ao REXX</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2014/10/iniciacao-ao-rexx-quando-o-mainframe-te.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2014/10/iniciacao-ao-rexx-quando-o-mainframe-te.html" target="_blank">
+<button>Explorar</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Mary Hawes</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2014/11/mary-hawes-mulher-que-chamou-reuniao.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2014/11/mary-hawes-mulher-que-chamou-reuniao.html" target="_blank">
+<button>Ler História</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>IBM vs Burroughs</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2014/12/ibm-burroughs-treta-que-pariu-o-cobol-e.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2014/12/ibm-burroughs-treta-que-pariu-o-cobol-e.html" target="_blank">
+<button>Ver História</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Confusão do Software Legado</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/a-grande-confusao-do-software-legados.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/a-grande-confusao-do-software-legados.html" target="_blank">
+<button>Abrir</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Jornada Bellacosa Mainframe</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/a-incrivel-jornada-bellacosa-mainframe.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/a-incrivel-jornada-bellacosa-mainframe.html" target="_blank">
+<button>Explorar</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>CICS — Processamento Online</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/cics-o-coracao-do-processamento-online.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/cics-o-coracao-do-processamento-online.html" target="_blank">
+<button>Ler</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>COBOL sustenta o mundo</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/cobol-o-mundo-depende-de-um-codigo-de.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/cobol-o-mundo-depende-de-um-codigo-de.html" target="_blank">
+<button>Ler</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>COBOL ainda resiste</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/cobol-resiste-na-muralha-digital-o.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/cobol-resiste-na-muralha-digital-o.html" target="_blank">
+<button>Explorar</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Levantamento de Requisitos</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/deu-ruim-no-levantamento-de-requisitos.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/deu-ruim-no-levantamento-de-requisitos.html" target="_blank">
+<button>Ler</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Dilema da Seringa</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/dilema-da-seringa-em-programacao-de.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/dilema-da-seringa-em-programacao-de.html" target="_blank">
+<button>Abrir</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Ferramentas CASE</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/ferramentas-case-no-mundo-mainframe.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/ferramentas-case-no-mundo-mainframe.html" target="_blank">
+<button>Explorar</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Ataques Hackers no Brasil</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/maiores-ataques-hackers-no-brasil.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/maiores-ataques-hackers-no-brasil.html" target="_blank">
+<button>Ler</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Waterfall</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/metodologia-waterfall-o-que-e-para-que.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/metodologia-waterfall-o-que-e-para-que.html" target="_blank">
+<button>Abrir</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>MVS</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/mvs-o-parrudo-sistema-operacional-dos.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/mvs-o-parrudo-sistema-operacional-dos.html" target="_blank">
+<button>Explorar</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Mainframe não é Dodo</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/o-mainframe-nao-e-um-passaro-dodo.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/o-mainframe-nao-e-um-passaro-dodo.html" target="_blank">
+<button>Ler</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>JAD</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/o-que-e-jad-joint-application-design.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/o-que-e-jad-joint-application-design.html" target="_blank">
+<button>Ver</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>DFD</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/o-que-e-um-diagrama-de-fluxo-de-dados.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/o-que-e-um-diagrama-de-fluxo-de-dados.html" target="_blank">
+<button>Explorar</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Paradigma Procedural</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/paradigma-procedural-logica-de.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/paradigma-procedural-logica-de.html" target="_blank">
+<button>Ler</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Pessoas erram COBOL</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/pessoas-erram-cobol-ainda-nao-morreu.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/pessoas-erram-cobol-ainda-nao-morreu.html" target="_blank">
+<button>Abrir</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Pontos de Função</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/pontos-de-funcao-um-pouco-sobre.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/pontos-de-funcao-um-pouco-sobre.html" target="_blank">
+<button>Aprender</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Taikodom</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/taikodom-o-mmorpg-brasileiro-que-veio.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/taikodom-o-mmorpg-brasileiro-que-veio.html" target="_blank">
+<button>Explorar</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Tríplice Alicerce</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/triplice-alicerce-da-informatica.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/triplice-alicerce-da-informatica.html" target="_blank">
+<button>Ler</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Um Jedi em Mainframe</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/um-jedi-em-mainframe-agora-um-ibm.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/um-jedi-em-mainframe-agora-um-ibm.html" target="_blank">
+<button>Explorar</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Portugol</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/uma-breve-visao-sobre-portugol-para-ibm.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/uma-breve-visao-sobre-portugol-para-ibm.html" target="_blank">
+<button>Ler</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Universidades</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/uma-pergunta-cordial-as-universidades.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/uma-pergunta-cordial-as-universidades.html" target="_blank">
+<button>Abrir</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Bits Bytes Kilobytes</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/voce-sabe-o-que-sao-bits-bytes-kilobytes.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/voce-sabe-o-que-sao-bits-bytes-kilobytes.html" target="_blank">
+<button>Aprender</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>Watson Z17</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2025/07/watson-z17-e-o-que-e-real-na-ia-moderna.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2025/07/watson-z17-e-o-que-e-real-na-ia-moderna.html" target="_blank">
+<button>Explorar</button>
+</a>
+</div>
+
+<div class="knowledge-card">
+<h3>IPL Simulator</h3>
+<iframe src="https://eljefemidnightlunch.blogspot.com/2026/03/ipl-simulator.html"></iframe>
+<a href="https://eljefemidnightlunch.blogspot.com/2026/03/ipl-simulator.html" target="_blank">
+<button>Executar IPL</button>
+</a>
+</div>
+
+</div>
+
+</section>
+
+
+</section>
+
+<br>
+<br>
+<br>
+<br>
+
+<section class="social-hub">
+
+<h2 class="hub-title">🌐 Bellacosa Mainframe Social Hub</h2>
+
+<div class="hub-grid">
+
+<div class="hub-card">
+
+<h3>📰 El Jefe Midnight Lunch</h3>
+
+<iframe src="https://eljefemidnightlunch.blogspot.com/" loading="lazy"></iframe>
+
+<div class="hub-actions">
+
+<button>👍 Curtir</button>
+<button onclick="window.open('https://eljefemidnightlunch.blogspot.com/')">⭐ Follow</button>
+<button onclick="window.open('https://eljefemidnightlunch.blogspot.com/')">🔔 FollowMe</button>
+
+</div>
+
+</div>
+
+
+<div class="hub-card">
+
+<h3>💼 LinkedIn Post</h3>
+
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7436637875464626176"></iframe>
+
+<div class="hub-actions">
+
+<button>👍 Curtir</button>
+<button onclick="window.open('https://www.linkedin.com/')">⭐ Follow</button>
+<button onclick="window.open('https://www.linkedin.com/')">🔔 FollowMe</button>
+
+</div>
+
+</div>
+
+
+<div class="hub-card">
+
+<h3>📬 Newsletter Aprenda no Bellacosa</h3>
+
+<div style="max-width:420px;background:#0f172a;color:white;padding:18px;border-radius:12px;">
+<h3>☕ Aprenda no Bellacosa Mainframe</h3>
+
+<p>
+Conteúdo sobre COBOL, Mainframe e tecnologia que sustenta o mundo bancário.
+</p>
+
+<a href="https://www.linkedin.com/newsletters/aprenda-no-bellacosa-mainframe-7359389056255901697/"
+target="_blank"
+style="background:#0A66C2;color:white;padding:10px 14px;border-radius:6px;text-decoration:none;">
+Abrir Newsletter
+</a>
+</div>
+
+<iframe src="https://www.linkedin.com/newsletters/aprenda-no-bellacosa-mainframe-7359389056255901697/"></iframe>
+
+<div class="hub-actions">
+
+<button>👍 Curtir</button>
+<button onclick="window.open('https://www.linkedin.com/newsletters/aprenda-no-bellacosa-mainframe-7359389056255901697/')">⭐ Follow</button>
+<button onclick="window.open('https://www.linkedin.com/newsletters/aprenda-no-bellacosa-mainframe-7359389056255901697/')">🔔 FollowMe</button>
+                              https://www.linkedin.com/newsletters/aprenda-no-bellacosa-mainframe-7359389056255901697/
+</div>
+
+
+</div>
+
+
+<div class="hub-card">
+
+<h3>📢 LinkedIn Activity</h3>
+
+<iframe src="https://www.linkedin.com/feed/update/urn:li:activity:7351406782457511936"></iframe>
+
+<div class="hub-actions">
+
+<button>👍 Curtir</button>
+<button onclick="window.open('https://www.linkedin.com/feed/update/urn:li:activity:7351406782457511936')">⭐ Follow</button>
+<button onclick="window.open('https://www.linkedin.com/feed/update/urn:li:activity:7351406782457511936')">🔔 FollowMe</button>
+
+</div>
+
+</div>
+
+
+<div class="hub-card">
+
+<h3>☕ Um Café no Bellacosa</h3>
+
+<iframe src="https://www.linkedin.com/newsletters/um-caf%C3%A9-no-bellacosa-mainframe-7347385458416390144/"></iframe>
+
+<div class="hub-actions">
+
+<button>👍 Curtir</button>
+<button onclick="window.open('https://www.linkedin.com/newsletters/um-caf%C3%A9-no-bellacosa-mainframe-7347385458416390144/')">⭐ Follow</button>
+<button onclick="window.open('https://www.linkedin.com/newsletters/um-caf%C3%A9-no-bellacosa-mainframe-7347385458416390144/')">🔔 FollowMe</button>
+
+</div>
+
+</div>
+
+
+<div class="hub-card">
+
+<h3>🚀 Bellacosa Updates</h3>
+
+<iframe src="https://www.linkedin.com"></iframe>
+
+<div class="hub-actions">
+
+<button>👍 Curtir</button>
+<button onclick="window.open('https://www.linkedin.com')">⭐ Follow</button>
+<button onclick="window.open('https://www.linkedin.com')">🔔 FollowMe</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<br>
+<br><br>
+<br><br>
+<br><br>
+<br>
+
+<!-- =================================================
+FOOTER
+================================================= -->
+
+
+<footer class="footer">
+
+<p>
+IBM Z Operations Simulator
+</p>
+
+<p>
+Educational Mainframe Monitoring Dashboard
+</p>
+
+<p>
+Created by <strong>Vagner Bellacosa</strong>
+</p>
+
+<p>
+Technologies: HTML • CSS • JavaScript • Chart.js
+</p>
+
+<p>
+© 2026 Bellacosa Mainframe
+</p>
+
+</footer>
+
+
+<!-- MAIN SIMULATOR SCRIPT -->
+
+<script src="assets\js\simulator.js"></script>
+
+</body>
+
+</html>
